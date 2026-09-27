@@ -1,0 +1,10 @@
+{
+  "dataset_dir": "C:\\Users\\Surabhi Deshpande\\project_1\\maestro-v3.0.0",
+  "output_dir": "C:\\Users\\Surabhi Deshpande\\project_1\\maestro_readable",
+  "pieces_converted": 1276,
+  "files": [
+    "pieces.csv",
+    "notes_index.csv",
+    "notes/*.notes.csv"
+  ]
+}
