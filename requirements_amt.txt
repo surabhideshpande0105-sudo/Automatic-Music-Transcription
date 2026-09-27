@@ -1,0 +1,10 @@
+# AMT full stack (Windows + Python 3.12). Baseline runs on numpy only.
+numpy>=1.26
+# Polyphonic model (install after baseline works):
+# basic-pitch>=0.3.0 pulls tensorflow; on Windows use Python 3.10-3.11 venv if TF fails on 3.12
+basic-pitch
+librosa
+soundfile
+sounddevice
+pretty_midi
+music21

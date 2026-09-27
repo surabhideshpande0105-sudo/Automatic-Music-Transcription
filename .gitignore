@@ -1,0 +1,15 @@
+# MAESTRO data (MIDI + audio, ~100GB full)
+maestro-v3.0.0/
+maestro_readable/notes/
+maestro_readable/*.csv
+# Trained artifacts
+models/*.json
+generated/*.wav
+# Python
+__pycache__/
+.venv*/
+.venv-amt/
+*.pyc
+# OS
+.DS_Store
+Thumbs.db

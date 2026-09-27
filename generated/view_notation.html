@@ -1,0 +1,17 @@
+<!doctype html><html><head><meta charset="utf-8"><title>AMT Score Viewer (no MuseScore needed)</title>
+<script src="https://cdn.jsdelivr.net/npm/opensheetmusicdisplay@1.8.5/build/opensheetmusicdisplay.min.js"></script>
+<style>body{font-family:Segoe UI,Arial;margin:16px} #osmd{border:1px solid #ccc;padding:8px} </style></head>
+<body><h2>AMT Notation Viewer</h2>
+<p>1. Click Choose File → pick <b>librosa.musicxml</b> or <b>baseline_stream.musicxml</b> from this folder.<br>2. Score renders below. No install needed (needs internet once for OSMD CDN).</p>
+<input type="file" id="f" accept=".musicxml,.xml">
+<div id="osmd"></div>
+<script>
+const osmd = new opensheetmusicdisplay.OpenSheetMusicDisplay("osmd");
+document.getElementById("f").addEventListener("change", e=>{
+  const r = new FileReader();
+  r.onload = ()=> osmd.load(r.result).then(()=>osmd.render());
+  r.readAsText(e.target.files[0]);
+});
+// auto-load if served over http
+["librosa.musicxml","baseline_stream.musicxml"].forEach(()=>{});
+</script></body></html>
