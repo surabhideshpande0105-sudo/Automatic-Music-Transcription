@@ -1,21 +1,36 @@
-"""Offline file -> MIDI using librosa (no TensorFlow). For Basic Pitch later use Python 3.11."""
+"""Offline file -> MIDI. Basic Pitch if present (any single instrument), else built-in finder."""
 from __future__ import annotations
 import numpy as np
 
-def transcribe_file_auto(wav_path: str, out_mid: str, sr: int = 22050) -> tuple[int, str]:
+INSTRUMENT_PRESETS: dict[str, dict] = {
+    "Any single instrument": {"min_f": 30.0, "max_f": 4200.0, "lo": 21, "hi": 108},
+    "Piano": {"min_f": 27.5, "max_f": 4200.0, "lo": 21, "hi": 108},
+    "Guitar": {"min_f": 70.0, "max_f": 1400.0, "lo": 28, "hi": 84},
+    "Violin": {"min_f": 190.0, "max_f": 3500.0, "lo": 55, "hi": 100},
+    "Flute": {"min_f": 250.0, "max_f": 2400.0, "lo": 60, "hi": 96},
+    "Bass": {"min_f": 30.0, "max_f": 500.0, "lo": 21, "hi": 60},
+}
+
+def transcribe_file_auto(wav_path: str, out_mid: str, sr: int = 22050,
+                         instrument: str = "Any single instrument") -> tuple[int, str]:
     """Try Basic Pitch if installed, else improved librosa. Returns (note_count, engine)."""
+    p = INSTRUMENT_PRESETS.get(instrument, INSTRUMENT_PRESETS["Any single instrument"])
     try:
         from amt_baseline import BasicPitchWrapper
-        BasicPitchWrapper().transcribe_file(wav_path, out_mid)
+        BasicPitchWrapper().transcribe_file(wav_path, out_mid,
+                                            min_freq=p["min_f"], max_freq=p["max_f"])
         import pretty_midi
         n = len([x for i in pretty_midi.PrettyMIDI(out_mid).instruments for x in i.notes])
-        return n, "Basic Pitch (polyphonic)"
+        return n, f"Basic Pitch ({instrument})"
     except Exception:
-        n = transcribe_file_librosa_v2(wav_path, out_mid, sr=sr)
-        return n, "Built-in pitch finder (single notes)"
+        n = transcribe_file_librosa_v2(wav_path, out_mid, sr=sr, min_f=p["min_f"],
+                                       max_f=p["max_f"], lo_midi=p["lo"], hi_midi=p["hi"])
+        return n, f"Built-in finder ({instrument}, single notes)"
 
 
-def transcribe_file_librosa_v2(wav_path: str, out_mid: str, sr: int = 22050) -> int:
+def transcribe_file_librosa_v2(wav_path: str, out_mid: str, sr: int = 22050,
+                               min_f: float = 30.0, max_f: float = 4200.0,
+                               lo_midi: int = 21, hi_midi: int = 108) -> int:
     """Onset-segmented monophonic transcription: one note per onset segment."""
     import librosa
     from amt_score import write_midi
@@ -42,13 +57,13 @@ def transcribe_file_librosa_v2(wav_path: str, out_mid: str, sr: int = 22050) -> 
         j = a + int(np.argmax(seg.mean(axis=1)))
         f = float(pitches[min(j, pitches.shape[0] - 1), min(a, pitches.shape[1] - 1)])
         peak = float(seg.max())
-        if 55 < f < 2000 and peak > 0.01:
+        if min_f < f < max_f and peak > 0.01:
             midi = int(round(69 + 12 * np.log2(f / 440.0)))
             t0 = float(times[a])
             t1 = float(times[min(b, len(times) - 1)])
             if t1 - t0 < 0.12:
                 t1 = t0 + 0.3
-            notes.append({"pitch": max(21, min(108, midi)), "velocity": 80,
+            notes.append({"pitch": max(lo_midi, min(hi_midi, midi)), "velocity": 80,
                           "start_seconds": t0, "end_seconds": min(t1, t0 + 2.0)})
     write_midi(out_mid, notes)
     return len(notes)

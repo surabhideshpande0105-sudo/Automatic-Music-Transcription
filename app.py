@@ -13,9 +13,9 @@ import pretty_midi
 from amt_offline import transcribe_file_auto
 from amt_score import midi_to_musicxml
 
-st.set_page_config(page_title="Piano to Sheet Music", page_icon="🎹", layout="wide")
-st.title("🎹 Piano to Sheet Music")
-st.write("Record or upload piano playing, get sheet music. No technical knowledge needed.")
+st.set_page_config(page_title="Music to Sheet Music", page_icon="🎵", layout="wide")
+st.title("🎵 Music to Sheet Music")
+st.write("Upload or record an instrument, get sheet music. One instrument at a time works best.")
 
 with st.expander("How does it work? (30 seconds)", expanded=False):
     st.write("1. Pick your music below. 2. Press the big **Transcribe** button. "
@@ -28,7 +28,7 @@ audio_bytes: bytes | None = None
 fname = "input.wav"
 
 if choice == "Upload a file":
-    up = st.file_uploader("Drop a WAV/MP3 recording of piano", type=["wav", "mp3", "ogg", "flac", "m4a"])
+    up = st.file_uploader("Drop a WAV/MP3 recording (one instrument is best)", type=["wav", "mp3", "ogg", "flac", "m4a"])
     if up:
         audio_bytes, fname = up.read(), up.name
 elif choice == "Record with mic":
@@ -49,6 +49,10 @@ if not audio_bytes:
 st.header("Step 2 — Listen and transcribe")
 st.audio(audio_bytes)
 st.write(f"Selected: **{html.escape(fname)}** ({len(audio_bytes)/1024:.0f} KB)")
+from amt_offline import INSTRUMENT_PRESETS
+instrument = st.selectbox("Which instrument is this?",
+                          list(INSTRUMENT_PRESETS.keys()),
+                          help="Narrows the pitch range. Full band mixes are not supported yet — record one instrument at a time.")
 
 if not st.button("✨ Transcribe my music", type="primary", use_container_width=True):
     st.stop()
@@ -60,12 +64,12 @@ with st.spinner("Listening to every note… (takes a few seconds)"):
         Path(src).write_bytes(audio_bytes)
         mid = str(Path(d) / "transcription.mid")
         try:
-            n, engine = transcribe_file_auto(src, mid)
+            n, engine = transcribe_file_auto(src, mid, instrument=instrument)
         except Exception as e:
             st.error(f"Sorry, I could not read that file ({e}). Try a WAV piano clip.")
             st.stop()
         if n == 0:
-            st.warning("I heard sound but found no clear piano notes. Try a louder, clearer clip.")
+            st.warning("I heard sound but found no clear notes. Try a louder solo-instrument clip.")
             st.stop()
         m = pretty_midi.PrettyMIDI(mid)
         notes = [x for i in m.instruments for x in i.notes]
@@ -135,4 +139,5 @@ if xml_text:
     st.download_button("Download Sheet Music (MusicXML)", xml_text, "my-transcription.musicxml", use_container_width=True)
     st.caption("MusicXML opens in MuseScore, Flat.io, or soundslice.com — or just read it above.")
 with st.expander("Advanced details"):
-    st.write(f"Engine: {engine}. Swap to Basic Pitch on Python 3.11 for multi-note chords.")
+    st.write(f"Engine: {engine}. Basic Pitch handles any single instrument with chords; "
+             "dense band mixes need source separation first (roadmap: Demucs stems + per-stem transcription).")

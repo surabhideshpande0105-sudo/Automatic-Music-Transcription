@@ -27,13 +27,18 @@ class EnergyGate:
 
 
 class BasicPitchWrapper:
-    """Drop-in polyphonic model. Needs: pip install basic-pitch."""
+    """Instrument-agnostic polyphonic model (best one instrument at a time). Needs: pip install basic-pitch."""
     def __init__(self):
         from basic_pitch.inference import predict
         from basic_pitch import ICASSP_2022_MODEL_PATH
         self._predict = predict
         self._model = ICASSP_2022_MODEL_PATH
 
-    def transcribe_file(self, wav_path: str, out_mid: str) -> None:
-        _, midi_data, _ = self._predict(str(wav_path))
+    def transcribe_file(self, wav_path: str, out_mid: str,
+                        min_freq: float = 30.0, max_freq: float = 4200.0) -> None:
+        try:
+            _, midi_data, _ = self._predict(str(wav_path), minimum_frequency=min_freq,
+                                            maximum_frequency=max_freq)
+        except TypeError:
+            _, midi_data, _ = self._predict(str(wav_path))
         midi_data.write(str(out_mid))
