@@ -11,6 +11,17 @@ import matplotlib.pyplot as plt
 import pretty_midi
 
 from amt_offline import transcribe_file_auto
+try:
+    from amt_offline import INSTRUMENT_PRESETS
+except ImportError:
+    INSTRUMENT_PRESETS = {
+        "Any single instrument": {"min_f": 30.0, "max_f": 4200.0, "lo": 21, "hi": 108},
+        "Piano": {"min_f": 27.5, "max_f": 4200.0, "lo": 21, "hi": 108},
+        "Guitar": {"min_f": 70.0, "max_f": 1400.0, "lo": 28, "hi": 84},
+        "Violin": {"min_f": 190.0, "max_f": 3500.0, "lo": 55, "hi": 100},
+        "Flute": {"min_f": 250.0, "max_f": 2400.0, "lo": 60, "hi": 96},
+        "Bass": {"min_f": 30.0, "max_f": 500.0, "lo": 21, "hi": 60},
+    }
 from amt_score import midi_to_musicxml
 
 st.set_page_config(page_title="Music to Sheet Music", page_icon="🎵", layout="wide")
@@ -49,7 +60,6 @@ if not audio_bytes:
 st.header("Step 2 — Listen and transcribe")
 st.audio(audio_bytes)
 st.write(f"Selected: **{html.escape(fname)}** ({len(audio_bytes)/1024:.0f} KB)")
-from amt_offline import INSTRUMENT_PRESETS
 instrument = st.selectbox("Which instrument is this?",
                           list(INSTRUMENT_PRESETS.keys()),
                           help="Narrows the pitch range. Full band mixes are not supported yet — record one instrument at a time.")
