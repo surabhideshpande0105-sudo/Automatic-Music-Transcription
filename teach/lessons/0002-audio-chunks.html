@@ -1,0 +1,17 @@
+<!doctype html><html><head><meta charset="utf-8"><title>0002 Audio chunks</title><link rel="stylesheet" href="../assets/style.css"></head>
+<body><div class="wrap"><p class="sub">Lesson 0002 · 7 min</p><h1>200ms chunks are the heartbeat</h1>
+<p>Sound is numbers: <b>sample rate</b> × time. At 22050 Hz, 200ms = 4410 samples. <code>amt_audio.py:9</code> <code>read_wav_mono()</code> forces mono + that rate; <code>FileChunker</code> slices file audio, <code>MicStream</code> yields live mic blocks of the same size.</p>
+<div class="fig"><svg viewBox="0 0 720 150" width="100%" role="img" aria-label="chunking">
+<rect x="10" y="50" width="420" height="40" rx="8" fill="#f6f4ee" stroke="#999"/><text x="220" y="74" text-anchor="middle" font-size="12">2.0s @22050Hz = 44100 samples</text>
+<rect x="10" y="100" width="84" height="26" fill="#0b5fff"/><rect x="98" y="100" width="84" height="26" fill="#0b5fff" opacity=".75"/><rect x="186" y="100" width="84" height="26" fill="#0b5fff" opacity=".5"/><text x="220" y="142" text-anchor="middle" font-size="11">10 × 200ms chunks (4410 each)</text></svg>
+<p class="small">Your <code>my_first_audio.wav</code> is 2s → 10 chunks. <code>test_latency.py</code> measured ~0.15ms per chunk for I/O + gate — budget passes before the model runs.</p></div>
+<div class="card">Mic = same chunks, different source: <code>sounddevice.InputStream(blocksize=chunk)</code> calls back every 200ms into a queue. File and mic converge to one <code>process(chunk)</code> interface.</div>
+<pre>from amt_audio import FileChunker
+for c in FileChunker("my_first_audio.wav", chunk_ms=200):
+    print(len(c))  # 4410 ...</pre>
+<div class="quiz" id="q2"><b>Check: 200ms at 22050 Hz equals…</b>
+<button data-k="a">Four thousand samples</button><button data-k="b">Forty thousand samples</button><button data-k="c">Four hundred samples</button><p class="fb small"></p></div>
+<p class="small">Primary source: <a href="https://python-sounddevice.readthedocs.io/">sounddevice blocksize docs</a>. Reference: <a href="../reference/pipeline-cheatsheet.html">pipeline</a>.</p>
+<p class="small"><b>Ask me:</b> anything about resampling in <code>read_wav_mono</code>. Next: <a href="0003-frontend-app.html">Lesson 3 — frontend</a>.</p>
+<div class="nav"><a href="0001-what-is-amt.html">← Prev</a><a href="0003-frontend-app.html">Next →</a></div></div>
+<script src="../assets/quiz.js"></script><script>quiz("q2","a")</script></body></html>

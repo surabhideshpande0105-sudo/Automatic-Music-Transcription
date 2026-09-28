@@ -1,0 +1,17 @@
+<!doctype html><html><head><meta charset="utf-8"><title>0008 Multi-instrument</title><link rel="stylesheet" href="../assets/style.css"></head>
+<body><div class="wrap"><p class="sub">Lesson 0008 · 6 min</p><h1>One instrument, six ranges</h1>
+<p>The app is no longer piano-only. An instrument dropdown in <code>app.py</code> selects a preset from <code>INSTRUMENT_PRESETS (amt_offline.py:5)</code> — each a frequency window plus a MIDI range that prunes impossible guesses (guitar can't play C1).</p>
+<div class="fig"><svg viewBox="0 0 720 170" width="100%" role="img" aria-label="instrument ranges">
+<line x1="60" y1="30" x2="660" y2="30" stroke="#999"/><text x="60" y="20" font-size="11">27Hz</text><text x="640" y="20" font-size="11">4.2kHz</text>
+<rect x="60" y="45" width="600" height="16" fill="#0b5fff" opacity=".85"/><text x="65" y="57" font-size="10" fill="#fff">Piano 21–108</text>
+<rect x="150" y="66" width="280" height="16" fill="#0b5fff" opacity=".6"/><text x="155" y="78" font-size="10" fill="#fff">Guitar 28–84</text>
+<rect x="330" y="87" width="200" height="16" fill="#0b5fff" opacity=".6"/><text x="335" y="99" font-size="10" fill="#fff">Violin 55–100</text>
+<rect x="60" y="108" width="120" height="16" fill="#0b5fff" opacity=".4"/><text x="65" y="120" font-size="10" fill="#fff">Bass 21–60</text></svg>
+<p class="small">Basic Pitch is instrument-agnostic but best <b>one instrument at a time</b> — the presets encode that honesty. Full band mixes need stem separation first (roadmap: Demucs + per-stem transcription).</p></div>
+<div class="card">Fallback safety: <code>app.py:13</code> re-defines the presets if the import ever fails, so users see music options, not an <code>ImportError</code>.</div>
+<div class="quiz" id="q8"><b>Check: presets prune by…</b>
+<button data-k="a">Pitch range limits</button><button data-k="b">Louder volume levels</button><button data-k="c">Faster tempo values</button><p class="fb small"></p></div>
+<p class="small">Primary source: <a href="https://github.com/spotify/basic-pitch">Basic Pitch repo (instrument-agnostic design)</a>.</p>
+<p class="small"><b>Ask me:</b> which preset fits your instrument. Next: <a href="0009-finder-v3.html">Lesson 9 — finder v3</a>.</p>
+<div class="nav"><a href="0007-layman-ux.html">← Prev</a><a href="0009-finder-v3.html">Next →</a></div></div>
+<script src="../assets/quiz.js"></script><script>quiz("q8","a")</script></body></html>

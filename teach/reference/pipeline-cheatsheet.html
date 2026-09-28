@@ -1,0 +1,15 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Pipeline cheatsheet</title><link rel="stylesheet" href="../assets/style.css"></head>
+<body><div class="wrap"><h1>Pipeline cheatsheet</h1><p class="sub">File paths = data contracts.</p>
+<svg viewBox="0 0 720 150" width="100%" role="img" aria-label="pipeline">
+<rect x="8" y="30" width="130" height="60" rx="10" fill="#f6f4ee" stroke="#999"/><text x="73" y="55" text-anchor="middle" font-size="13">.wav file/mic</text><text x="73" y="73" text-anchor="middle" font-size="11">22.05k mono</text>
+<rect x="158" y="30" width="130" height="60" rx="10" fill="#f6f4ee" stroke="#999"/><text x="223" y="55" text-anchor="middle" font-size="13">transcribe</text><text x="223" y="73" text-anchor="middle" font-size="11">librosa / BP</text>
+<rect x="308" y="30" width="110" height="60" rx="10" fill="#f6f4ee" stroke="#999"/><text x="363" y="55" text-anchor="middle" font-size="13">.mid</text><text x="363" y="73" text-anchor="middle" font-size="11">pitch+time</text>
+<rect x="438" y="30" width="130" height="60" rx="10" fill="#f6f4ee" stroke="#999"/><text x="503" y="55" text-anchor="middle" font-size="13">.musicxml</text><text x="503" y="73" text-anchor="middle" font-size="11">measures</text>
+<rect x="588" y="30" width="120" height="60" rx="10" fill="#f6f4ee" stroke="#999"/><text x="648" y="55" text-anchor="middle" font-size="13">viewer</text><text x="648" y="73" text-anchor="middle" font-size="11">OSMD/app</text>
+<line x1="138" y1="60" x2="158" y2="60" stroke="#333" marker-end="url(#a)"/><line x1="288" y1="60" x2="308" y2="60" stroke="#333"/><line x1="418" y1="60" x2="438" y2="60" stroke="#333"/><line x1="568" y1="60" x2="588" y2="60" stroke="#333"/>
+</svg>
+<div class="card">MIDI holds <b>performance</b> (pitch 21–108, start/end, velocity). MusicXML adds <b>engraving</b> (bars, clef, noteheads). Confusing them breaks the viewer.</div>
+<div class="card">Latency split: MIDI events ~200–500ms can stream; score needs 1–2s lookahead for beat/key. See <code>test_latency.py</code> (I/O) vs model cost.</div>
+<pre>python amt_offline.py my_song.wav generated/my_song.mid
+# → generated/my_song.mid + generated/my_song.musicxml</pre>
+<p class="small"><a href="../lessons/0001-what-is-amt.html">Lesson 1</a> · <a href="stack-cheatsheet.html">Stack</a></p></div></body></html>

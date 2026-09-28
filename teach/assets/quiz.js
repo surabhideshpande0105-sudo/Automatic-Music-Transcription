@@ -1,0 +1,1 @@
+function quiz(id, correct){const q=document.getElementById(id);q.querySelectorAll("button").forEach(b=>b.onclick=()=>{q.querySelectorAll("button").forEach(x=>x.classList.remove("ok","no"));b.classList.add(b.dataset.k===correct?"ok":"no");q.querySelector(".fb").textContent=b.dataset.k===correct?"Correct.":"Try again — reread the diagram.";});}

@@ -1,0 +1,17 @@
+<!doctype html><html><head><meta charset="utf-8"><title>0001 What is AMT</title><link rel="stylesheet" href="../assets/style.css"></head>
+<body><div class="wrap"><p class="sub">Lesson 0001 · 6 min · Mission: ship the AMT app</p><h1>Audio in, notation out</h1>
+<p>AMT turns sound into a <b>note list</b> (pitch + onset + duration), then into <b>notation</b>. Your project does this in two formats: <code>.mid</code> for performance, <code>.musicxml</code> for the printed score.</p>
+<div class="fig"><svg viewBox="0 0 720 170" width="100%" role="img" aria-label="AMT stages">
+<rect x="10" y="40" width="150" height="70" rx="10" fill="#fff" stroke="#999"/><text x="85" y="66" text-anchor="middle" font-size="13">waveform</text><text x="85" y="84" text-anchor="middle" font-size="11">pressure vs time</text>
+<rect x="200" y="40" width="150" height="70" rx="10" fill="#fff" stroke="#999"/><text x="275" y="66" text-anchor="middle" font-size="13">MIDI notes</text><text x="275" y="84" text-anchor="middle" font-size="11">60=C4, sec</text>
+<rect x="390" y="40" width="150" height="70" rx="10" fill="#fff" stroke="#999"/><text x="465" y="66" text-anchor="middle" font-size="13">MusicXML</text><text x="465" y="84" text-anchor="middle" font-size="11">bars + clef</text>
+<rect x="575" y="40" width="130" height="70" rx="10" fill="#0b5fff" stroke="#0b5fff"/><text x="640" y="66" text-anchor="middle" font-size="13" fill="#fff">you hear</text><text x="640" y="84" text-anchor="middle" font-size="11" fill="#fff">+ you read</text>
+<line x1="160" y1="75" x2="200" y2="75" stroke="#333"/><line x1="350" y1="75" x2="390" y2="75" stroke="#333"/><line x1="540" y1="75" x2="575" y2="75" stroke="#333"/></svg>
+<p class="small">Polyphonic = many pitches at once (piano chords). Monophonic = one at a time (your librosa placeholder). Your target is polyphonic piano.</p></div>
+<div class="card"><b>Latency split:</b> MIDI onsets can stream at ~200–500ms. Full notation waits 1–2s for beat/key context. That is why <code>test_latency.py</code> checks I/O only — the model costs extra.</div>
+<div class="quiz" id="q1"><b>Check: a <code>.mid</code> file holds…</b>
+<button data-k="a">Pitch timing data</button><button data-k="b">Engraved staff notation</button><button data-k="c">Raw audio waveform</button><p class="fb small"></p></div>
+<p class="small">Primary source: <a href="https://github.com/spotify/basic-pitch">Basic Pitch repo — AMT definition + demo</a>. Reference: <a href="../reference/pipeline-cheatsheet.html">pipeline cheatsheet</a>, <a href="../reference/stack-cheatsheet.html">stack</a>.</p>
+<p class="small"><b>Ask me:</b> paste any confusing line from <code>app.py</code> and I will trace it. Next: <a href="0002-audio-chunks.html">Lesson 2 — audio chunks</a>.</p>
+<div class="nav"><span></span><a href="0002-audio-chunks.html">Next →</a></div></div>
+<script src="../assets/quiz.js"></script><script>quiz("q1","a")</script></body></html>

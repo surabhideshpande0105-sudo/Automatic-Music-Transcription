@@ -1,0 +1,18 @@
+<!doctype html><html><head><meta charset="utf-8"><title>0005 MIDI to notation</title><link rel="stylesheet" href="../assets/style.css"></head>
+<body><div class="wrap"><p class="sub">Lesson 0005 · 7 min</p><h1>MIDI bytes become a score</h1>
+<p><code>write_midi (amt_score.py:19)</code> packs note on/off events with variable-length ticks at 480 ticks/beat, 120 BPM — pure stdlib, no dependency. <code>midi_to_musicxml (amt_score.py:44)</code> then asks music21 to quantize time into measures, clef, and noteheads.</p>
+<div class="fig"><svg viewBox="0 0 720 130" width="100%" role="img" aria-label="midi bytes">
+<rect x="10" y="30" width="220" height="60" rx="8" fill="#fff" stroke="#999"/><text x="120" y="54" text-anchor="middle" font-size="12">MThd + MTrk + events</text><text x="120" y="72" text-anchor="middle" font-size="11">90 3C 50 = note-on C4</text>
+<rect x="260" y="30" width="200" height="60" rx="8" fill="#fff" stroke="#999"/><text x="360" y="54" text-anchor="middle" font-size="12">music21 quantize</text><text x="360" y="72" text-anchor="middle" font-size="11">beats → bars</text>
+<rect x="490" y="30" width="220" height="60" rx="8" fill="#fff" stroke="#999"/><text x="600" y="54" text-anchor="middle" font-size="12">&lt;step&gt;C&lt;/step&gt;</text><text x="600" y="72" text-anchor="middle" font-size="11">MusicXML viewed</text>
+<line x1="230" y1="60" x2="260" y2="60" stroke="#333"/><line x1="460" y1="60" x2="490" y2="60" stroke="#333"/></svg>
+<p class="small">Side-quest, not transcription: <code>train_model.py:86 train()</code> learns Markov MIDI→MIDI transitions from MAESTRO CSVs and generates new MIDIs. Useful for data, not for audio.</p></div>
+<pre>python amt_offline.py my_song.wav generated/my_song.mid
+# → generated/my_song.mid + generated/my_song.musicxml
+# view: generated/view_notation.html → Choose File</pre>
+<div class="quiz" id="q5"><b>Check: MusicXML adds what MIDI lacks?</b>
+<button data-k="a">Bars clefs engraving</button><button data-k="b">Pitch timing data</button><button data-k="c">Audio sample bytes</button><p class="fb small"></p></div>
+<p class="small">Primary source: <a href="https://web.mit.edu/music21/">music21 docs</a>. Reference: <a href="../reference/stack-cheatsheet.html">stack</a>, <a href="../reference/pipeline-cheatsheet.html">pipeline</a>.</p>
+<p class="small"><b>Ask me:</b> paste your <code>generated/*.musicxml</code> &lt;note&gt; block and I will decode it. Next: <a href="0006-vlq-bug.html">Lesson 6 — the VLQ bug</a>.</p>
+<div class="nav"><a href="0004-transcription-model.html">← Prev</a><a href="0006-vlq-bug.html">Next →</a></div></div>
+<script src="../assets/quiz.js"></script><script>quiz("q5","a")</script></body></html>

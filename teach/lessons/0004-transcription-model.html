@@ -1,0 +1,20 @@
+<!doctype html><html><head><meta charset="utf-8"><title>0004 Transcription model</title><link rel="stylesheet" href="../assets/style.css"></head>
+<body><div class="wrap"><p class="sub">Lesson 0004 · 8 min</p><h1>Placeholder today, CNN tomorrow</h1>
+<p>Two detectors live in your repo. <code>EnergyGate (amt_baseline.py:7)</code> only checks loudness — it proves the 200ms loop. <code>transcribe_file_librosa (amt_offline.py:5)</code> does STFT → piptrack → one pitch per second — monophonic, which is why your test file yields all C4s.</p>
+<div class="fig"><svg viewBox="0 0 720 170" width="100%" role="img" aria-label="model comparison">
+<text x="10" y="20" font-size="12">librosa placeholder (now): waveform → STFT → peak pick → 1 pitch</text>
+<rect x="10" y="30" width="110" height="34" fill="#f6f4ee" stroke="#999"/><text x="65" y="52" text-anchor="middle" font-size="11">waveform</text>
+<rect x="130" y="30" width="110" height="34" fill="#f6f4ee" stroke="#999"/><text x="185" y="52" text-anchor="middle" font-size="11">spectrogram</text>
+<rect x="250" y="30" width="110" height="34" fill="#f6f4ee" stroke="#999"/><text x="305" y="52" text-anchor="middle" font-size="11">one peak</text>
+<text x="10" y="95" font-size="12">Basic Pitch (next): spectrogram → CNN → many notes + onsets</text>
+<rect x="10" y="105" width="110" height="34" fill="#0b5fff" stroke="#0b5fff"/><text x="65" y="127" text-anchor="middle" font-size="11" fill="#fff">spectrogram</text>
+<rect x="130" y="105" width="110" height="34" fill="#0b5fff" stroke="#0b5fff"/><text x="185" y="127" text-anchor="middle" font-size="11" fill="#fff">CNN model</text>
+<rect x="250" y="105" width="150" height="34" fill="#0b5fff" stroke="#0b5fff"/><text x="325" y="127" text-anchor="middle" font-size="11" fill="#fff">chords + rhythm</text></svg>
+<p class="small">Same input contract (<code>wav → mid</code>), so <code>app.py:36</code> swaps with one line: <code>BasicPitchWrapper().transcribe_file</code>. Needs Python 3.11 venv (TF/ONNX), 2–4s context windows.</p></div>
+<div class="card">Formula you already use: <code>midi = 69 + 12·log2(f/440)</code> (<code>amt_offline.py:18</code>). A4 440Hz → 69.</div>
+<div class="quiz" id="q4"><b>Check: librosa output repeats C4 because…</b>
+<button data-k="a">It picks single peak</button><button data-k="b">It trains neural chords</button><button data-k="c">It reads MIDI input</button><p class="fb small"></p></div>
+<p class="small">Primary source: <a href="https://github.com/spotify/basic-pitch">Basic Pitch repo + ICASSP paper</a>, <a href="https://librosa.org/doc/latest/index.html">librosa piptrack docs</a>.</p>
+<p class="small"><b>Ask me:</b> why polyphonic needs a CNN and context windows. Next: <a href="0005-midi-to-notation.html">Lesson 5 — notation</a>.</p>
+<div class="nav"><a href="0003-frontend-app.html">← Prev</a><a href="0005-midi-to-notation.html">Next →</a></div></div>
+<script src="../assets/quiz.js"></script><script>quiz("q4","a")</script></body></html>

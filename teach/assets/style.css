@@ -1,0 +1,11 @@
+:root{--ink:#1a1a1a;--mut:#5c5c5c;--acc:#0b5fff;--bg:#fff;--wash:#f6f4ee;--line:#e3ded2}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.65 Georgia,Palatino,serif}
+.wrap{max-width:760px;margin:0 auto;padding:32px 22px 64px}
+p,li{max-width:62ch}h1{font-size:2rem;line-height:1.15;margin:.2em 0}h2{margin-top:2em;font-size:1.3rem}
+.sub{color:var(--mut)}.card{background:var(--wash);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin:14px 0}
+code{font:13.5px/1.5 Consolas,monospace;background:#efede6;padding:1px 6px;border-radius:6px}
+pre{background:#111;color:#eee;border-radius:10px;padding:14px;overflow:auto;font:13px/1.55 Consolas,monospace}
+a{color:var(--acc)}.fig{border:1px solid var(--line);border-radius:10px;padding:10px;margin:14px 0;background:#fff}
+.small{font-size:.85rem;color:var(--mut)}.quiz button{display:block;width:100%;text-align:left;margin:6px 0;padding:9px;border:1px solid var(--line);border-radius:8px;background:#fff;cursor:pointer}
+.quiz button.ok{border-color:green}.quiz button.no{border-color:red}.nav{display:flex;justify-content:space-between;margin-top:28px}
+@media print{body{font-size:12pt}.nav,.quiz{display:none}}

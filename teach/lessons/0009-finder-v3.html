@@ -1,0 +1,17 @@
+<!doctype html><html><head><meta charset="utf-8"><title>0009 Finder v3</title><link rel="stylesheet" href="../assets/style.css"></head>
+<body><div class="wrap"><p class="sub">Lesson 0009 · 8 min · Why high notes and mixes improved</p><h1>Separate, track, harmonize</h1>
+<p>Three upgrades replaced max-magnitude picking. <b>HPSS</b> splits sustained tones from drum hits so pitched lines survive mixes. <b>pyin</b> tracks pitch probabilistically with smoothing instead of jumping to the loudest bin. A <b>residual voice</b> masks the lead's harmonics and reads the strongest remaining peak as one chord tone.</p>
+<div class="fig"><svg viewBox="0 0 720 150" width="100%" role="img" aria-label="finder v3">
+<rect x="10" y="40" width="130" height="60" rx="10" fill="#fff" stroke="#999"/><text x="75" y="64" text-anchor="middle" font-size="12">HPSS split</text><text x="75" y="82" text-anchor="middle" font-size="11">drop drums</text>
+<rect x="170" y="40" width="150" height="60" rx="10" fill="#fff" stroke="#999"/><text x="245" y="64" text-anchor="middle" font-size="12">pyin lead</text><text x="245" y="82" text-anchor="middle" font-size="11">octave-guarded</text>
+<rect x="350" y="40" width="150" height="60" rx="10" fill="#fff" stroke="#999"/><text x="425" y="64" text-anchor="middle" font-size="12">mask + peak</text><text x="425" y="82" text-anchor="middle" font-size="11">chord tone</text>
+<rect x="530" y="40" width="175" height="60" rx="10" fill="#0b5fff" stroke="#0b5fff"/><text x="617" y="64" text-anchor="middle" font-size="12" fill="#fff">2 voices out</text><text x="617" y="82" text-anchor="middle" font-size="11" fill="#fff">Pirates: 73→680</text>
+<line x1="140" y1="70" x2="170" y2="70" stroke="#333"/><line x1="320" y1="70" x2="350" y2="70" stroke="#333"/><line x1="500" y1="70" x2="530" y2="70" stroke="#333"/></svg>
+<p class="small">The octave guard matters most: pyin period-doubles on chords (reports C2 for C4), which used to poison masking. Now the lead is lifted toward the spectral peak before masking — C2 ghosts gone, chord C4+E4 found every slice.</p></div>
+<div class="card">Limits to remember: 2 voices max, rare deep-bass octave slip. Full polyphony still belongs to Basic Pitch on Python 3.11.</div>
+<div class="quiz" id="q9"><b>Check: HPSS removes…</b>
+<button data-k="a">Drum hit sounds</button><button data-k="b">High pitch notes</button><button data-k="c">Quiet melody lines</button><p class="fb small"></p></div>
+<p class="small">Primary source: <a href="https://librosa.org/doc/latest/generated/librosa.pyin.html">librosa.pyin docs</a>. Reference: <a href="../reference/stack-cheatsheet.html">stack</a>.</p>
+<p class="small"><b>Ask me:</b> any slice of your Pirates output and I will decode it. Next: <a href="0010-bulletproof-imports.html">Lesson 10 — imports</a>.</p>
+<div class="nav"><a href="0008-multi-instrument.html">← Prev</a><a href="0010-bulletproof-imports.html">Next →</a></div></div>
+<script src="../assets/quiz.js"></script><script>quiz("q9","a")</script></body></html>

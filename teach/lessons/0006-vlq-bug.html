@@ -1,0 +1,20 @@
+<!doctype html><html><head><meta charset="utf-8"><title>0006 The VLQ bug</title><link rel="stylesheet" href="../assets/style.css"></head>
+<body><div class="wrap"><p class="sub">Lesson 0006 · 7 min · The fix behind your Chariots score</p><h1>One reversed loop broke every timestamp</h1>
+<p>MIDI stores time gaps as <b>VLQ</b> bytes: 7 data bits per byte, most-significant group first, every byte but the last flagged with a top bit. Our <code>_varlen (amt_score.py:7)</code> emitted the groups <b>backwards</b>. Values under 128 looked fine; anything bigger decoded as garbage — 19200 ticks read back as 360449, so a 20s note replayed as 375s.</p>
+<div class="fig"><svg viewBox="0 0 720 150" width="100%" role="img" aria-label="VLQ byte order">
+<text x="10" y="22" font-size="12">19200 = groups [1] [22] [0] — correct order:</text>
+<rect x="10" y="32" width="90" height="34" fill="#0b5fff" stroke="#0b5fff"/><text x="55" y="55" text-anchor="middle" font-size="12" fill="#fff">0x81</text>
+<rect x="104" y="32" width="90" height="34" fill="#0b5fff" stroke="#0b5fff"/><text x="149" y="55" text-anchor="middle" font-size="12" fill="#fff">0x96</text>
+<rect x="198" y="32" width="90" height="34" fill="#0b5fff" stroke="#0b5fff"/><text x="243" y="55" text-anchor="middle" font-size="12" fill="#fff">0x00</text>
+<text x="10" y="95" font-size="12">buggy order (what we wrote):</text>
+<rect x="10" y="105" width="90" height="34" fill="#fff" stroke="#999"/><text x="55" y="128" text-anchor="middle" font-size="12">0x96</text>
+<rect x="104" y="105" width="90" height="34" fill="#fff" stroke="#999"/><text x="149" y="128" text-anchor="middle" font-size="12">0x80</text>
+<rect x="198" y="105" width="90" height="34" fill="#fff" stroke="#999"/><text x="243" y="128" text-anchor="middle" font-size="12">0x01</text></svg>
+<p class="small">Same bug lived in <code>train_model.py:188</code> — every generated MIDI was affected, not just transcriptions.</p></div>
+<div class="card">Rule learned: <b>roundtrip every writer through an independent reader</b>. The test that caught it encodes 0…360449 and decodes with <code>readable.py</code> — now zero failures.</div>
+<div class="quiz" id="q6"><b>Check: VLQ stores groups…</b>
+<button data-k="a">Big end first</button><button data-k="b">Small end first</button><button data-k="c">Only single bytes</button><p class="fb small"></p></div>
+<p class="small">Primary source: <a href="https://midi.org/specifications">Standard MIDI Files spec (midi.org)</a>. Reference: <a href="../reference/pipeline-cheatsheet.html">pipeline</a>.</p>
+<p class="small"><b>Ask me:</b> paste any <code>.mid</code> byte dump and I will decode its VLQs. Next: <a href="0007-layman-ux.html">Lesson 7 — layman UX</a>.</p>
+<div class="nav"><a href="0005-midi-to-notation.html">← Prev</a><a href="0007-layman-ux.html">Next →</a></div></div>
+<script src="../assets/quiz.js"></script><script>quiz("q6","a")</script></body></html>

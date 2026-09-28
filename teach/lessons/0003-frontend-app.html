@@ -1,0 +1,17 @@
+<!doctype html><html><head><meta charset="utf-8"><title>0003 Frontend app</title><link rel="stylesheet" href="../assets/style.css"></head>
+<body><div class="wrap"><p class="sub">Lesson 0003 · 7 min</p><h1>The app is thin by design</h1>
+<p><code>app.py</code> does no ML. It collects bytes, calls one function, and shows downloads. Two tabs share one variable: <code>audio_bytes</code>.</p>
+<div class="fig"><svg viewBox="0 0 720 150" width="100%" role="img" aria-label="app flow">
+<rect x="10" y="40" width="140" height="60" rx="10" fill="#fff" stroke="#999"/><text x="80" y="64" text-anchor="middle" font-size="12">upload / record</text><text x="80" y="82" text-anchor="middle" font-size="11">app.py:17-27</text>
+<rect x="180" y="40" width="140" height="60" rx="10" fill="#fff" stroke="#999"/><text x="250" y="64" text-anchor="middle" font-size="12">transcribe()</text><text x="250" y="82" text-anchor="middle" font-size="11">amt_offline:5</text>
+<rect x="350" y="40" width="150" height="60" rx="10" fill="#fff" stroke="#999"/><text x="425" y="64" text-anchor="middle" font-size="12">piano-roll plot</text><text x="425" y="82" text-anchor="middle" font-size="11">pretty_midi</text>
+<rect x="530" y="40" width="175" height="60" rx="10" fill="#fff" stroke="#999"/><text x="617" y="64" text-anchor="middle" font-size="12">MID + MusicXML</text><text x="617" y="82" text-anchor="middle" font-size="11">download_button</text>
+<line x1="150" y1="70" x2="180" y2="70" stroke="#333"/><line x1="320" y1="70" x2="350" y2="70" stroke="#333"/><line x1="500" y1="70" x2="530" y2="70" stroke="#333"/></svg>
+<p class="small">Score viewing leaves the app: save MusicXML, open <code>generated/view_notation.html</code> → Choose File (OSMD renders, no MuseScore).</p></div>
+<div class="card">Run: <code>streamlit run app.py</code> → open <code>http://localhost:8501</code> in Edge/Chrome. Keep the terminal alive; Ctrl+C stops it.</div>
+<div class="quiz" id="q3"><b>Check: the Transcribe button calls…</b>
+<button data-k="a">One transcribe function</button><button data-k="b">Full model training loop</button><button data-k="c">Browser score renderer</button><p class="fb small"></p></div>
+<p class="small">Primary source: <a href="https://docs.streamlit.io/">Streamlit docs (uploader, audio_input, download_button)</a>. Reference: <a href="../reference/stack-cheatsheet.html">stack</a>.</p>
+<p class="small"><b>Ask me:</b> paste an <code>app.py</code> traceback and I will fix it. Next: <a href="0004-transcription-model.html">Lesson 4 — model</a>.</p>
+<div class="nav"><a href="0002-audio-chunks.html">← Prev</a><a href="0004-transcription-model.html">Next →</a></div></div>
+<script src="../assets/quiz.js"></script><script>quiz("q3","a")</script></body></html>

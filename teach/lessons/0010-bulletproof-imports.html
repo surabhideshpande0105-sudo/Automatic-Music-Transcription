@@ -1,0 +1,15 @@
+<!doctype html><html><head><meta charset="utf-8"><title>0010 Bulletproof imports</title><link rel="stylesheet" href="../assets/style.css"></head>
+<body><div class="wrap"><p class="sub">Lesson 0010 · 5 min</p><h1>Never show a traceback</h1>
+<p>Your <code>ImportError: INSTRUMENT_PRESETS</code> happened with the name present in the file — mixed 3.12/3.13 <code>__pycache__</code> served a stale module to Streamlit's reloader. Two rules came out of it.</p>
+<div class="card"><b>Rule 1 — imports live at the top, with a fallback.</b> <code>app.py:13</code> tries the import and re-defines the presets on failure. Mid-file imports re-run on every Streamlit rerun and hide dependency problems.<br><b>Rule 2 — stale bytecode is a suspect.</b> Any impossible <code>ImportError</code>: stop the app, delete <code>__pycache__</code>, rerun.</div>
+<pre>from amt_offline import transcribe_file_auto
+try:
+    from amt_offline import INSTRUMENT_PRESETS
+except ImportError:
+    INSTRUMENT_PRESETS = {...}  # same presets, app keeps working</pre>
+<div class="quiz" id="q10"><b>Check: impossible ImportError first means…</b>
+<button data-k="a">Clear bytecode cache</button><button data-k="b">Reinstall every package</button><button data-k="c">Rewrite all modules</button><p class="fb small"></p></div>
+<p class="small">Primary source: <a href="https://docs.streamlit.io/">Streamlit docs (rerun model)</a>.</p>
+<p class="small"><b>Ask me:</b> paste any traceback and I will translate it. Restart: <a href="0001-what-is-amt.html">Lesson 1</a>.</p>
+<div class="nav"><a href="0009-finder-v3.html">← Prev</a><span></span></div></div>
+<script src="../assets/quiz.js"></script><script>quiz("q10","a")</script></body></html>

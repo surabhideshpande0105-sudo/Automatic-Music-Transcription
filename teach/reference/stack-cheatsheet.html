@@ -1,0 +1,12 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Stack cheatsheet</title><link rel="stylesheet" href="../assets/style.css"></head>
+<body><div class="wrap"><h1>Stack cheatsheet</h1><p class="sub">What each library does in this project. Print me.</p>
+<div class="card"><b>numpy / scipy</b> — arrays + STFT math. Used in <code>amt_audio.py</code>, <code>amt_offline.py</code>.</div>
+<div class="card"><b>librosa 0.10.2</b> — <code>load()</code>, <code>stft()</code>, <code>piptrack()</code>. Placeholder monophonic pitch. <a href="https://librosa.org/doc/latest/index.html">docs</a></div>
+<div class="card"><b>soundfile / sounddevice</b> — decode audio; mic callback blocks. <code>MicStream</code> yields 200ms float32.</div>
+<div class="card"><b>pretty_midi</b> — reads MIDIs for the piano-roll plot in <code>app.py:37</code>. <a href="https://github.com/craffel/pretty-midi">repo</a></div>
+<div class="card"><b>music21</b> — <code>converter.parse(mid).write("musicxml")</code> in <code>amt_score.py:49</code>. <a href="https://web.mit.edu/music21/">docs</a></div>
+<div class="card"><b>matplotlib (Agg)</b> — server-side piano-roll PNGs; no GUI needed.</div>
+<div class="card"><b>streamlit</b> — <code>file_uploader</code>, <code>audio_input</code>, <code>pyplot</code>, <code>download_button</code>. <a href="https://docs.streamlit.io/">docs</a></div>
+<div class="card"><b>basic-pitch (Spotify, ICASSP 2022)</b> — lightweight polyphonic CNN, ONNX default on Windows. <a href="https://github.com/spotify/basic-pitch">repo</a> / <a href="https://arxiv.org/abs/2203.09893">paper</a></div>
+<div class="card"><b>OpenSheetMusicDisplay</b> — renders MusicXML in <code>generated/view_notation.html</code>. <a href="https://opensheetmusicdisplay.github.io/">site</a></div>
+<p class="small">Back to <a href="../lessons/0001-what-is-amt.html">Lesson 1</a></p></div></body></html>
