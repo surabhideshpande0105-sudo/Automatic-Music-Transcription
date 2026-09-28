@@ -73,11 +73,15 @@ with st.spinner("Listening to every note… (takes a few seconds)"):
         src = str(Path(d) / Path(fname).name)
         Path(src).write_bytes(audio_bytes)
         mid = str(Path(d) / "transcription.mid")
+        prog = st.progress(0, text="Starting…")
         try:
-            n, engine = transcribe_file_auto(src, mid, instrument=instrument)
+            n, engine = transcribe_file_auto(
+                src, mid, instrument=instrument,
+                on_progress=lambda f, s: prog.progress(min(1.0, float(f)), text=s))
         except Exception as e:
             st.error(f"Sorry, I could not read that file ({e}). Try a WAV piano clip.")
             st.stop()
+        prog.empty()
         if n == 0:
             st.warning("I heard sound but found no clear notes. Try a louder solo-instrument clip.")
             st.stop()

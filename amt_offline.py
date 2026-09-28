@@ -12,7 +12,8 @@ INSTRUMENT_PRESETS: dict[str, dict] = {
 }
 
 def transcribe_file_auto(wav_path: str, out_mid: str, sr: int = 22050,
-                         instrument: str = "Any single instrument") -> tuple[int, str]:
+                         instrument: str = "Any single instrument",
+                         on_progress=None) -> tuple[int, str]:
     """Try Basic Pitch if installed, else improved librosa. Returns (note_count, engine)."""
     p = INSTRUMENT_PRESETS.get(instrument, INSTRUMENT_PRESETS["Any single instrument"])
     try:
@@ -24,15 +25,36 @@ def transcribe_file_auto(wav_path: str, out_mid: str, sr: int = 22050,
         return n, f"Basic Pitch ({instrument})"
     except Exception:
         n = transcribe_file_librosa_v2(wav_path, out_mid, sr=sr, min_f=p["min_f"],
-                                       max_f=p["max_f"], lo_midi=p["lo"], hi_midi=p["hi"])
+                                       max_f=p["max_f"], lo_midi=p["lo"], hi_midi=p["hi"],
+                                       on_progress=on_progress)
         return n, f"Built-in finder v3 ({instrument}, lead + chord voices)"
+
+
+def _load_mono_fast(path: str, sr: int):
+    """soundfile fast path (no resample when rates match), librosa fallback."""
+    try:
+        import soundfile as sf
+        y, file_sr = sf.read(str(path), dtype="float32", always_2d=False)
+        import numpy as np
+        y = np.asarray(y, dtype=np.float32)
+        if y.ndim > 1:
+            y = y.mean(axis=1)
+        if int(file_sr) != int(sr):
+            import librosa
+            y = librosa.resample(y, orig_sr=int(file_sr), target_sr=int(sr)).astype(np.float32)
+        return y
+    except Exception:
+        import librosa
+        y, _ = librosa.load(path, sr=sr, mono=True)
+        return y
 
 
 def transcribe_file_librosa_v2(wav_path: str, out_mid: str, sr: int = 22050,
                                min_f: float = 30.0, max_f: float = 4200.0,
                                lo_midi: int = 21, hi_midi: int = 108,
                                slice_seconds: float = 0.5,
-                               max_voices: int = 2) -> int:
+                               max_voices: int = 2,
+                               on_progress=None) -> int:
     """HPSS + pyin lead line + residual second voice, covering the full duration.
 
     - Harmonic/percussive separation drops drums so pitched lines survive mixes.
@@ -42,24 +64,38 @@ def transcribe_file_librosa_v2(wav_path: str, out_mid: str, sr: int = 22050,
     """
     import librosa
     from amt_score import write_midi
-    y, _ = librosa.load(wav_path, sr=sr, mono=True)
+
+    def _report(frac: float, stage: str) -> None:
+        try:
+            if on_progress is not None:
+                on_progress(frac, stage)
+        except Exception:
+            pass
+
+    _report(0.02, "loading audio")
+    y = _load_mono_fast(wav_path, sr)
     if y.size == 0:
         write_midi(out_mid, [])
         return 0
     hop = 512
+    pyin_hop = 2048  # coarser pyin grid: same slices, ~4x fewer YIN frames
+    _report(0.08, "separating drums")
     try:
-        yh = librosa.effects.harmonic(y, margin=4.0)
+        yh = librosa.effects.harmonic(y, margin=2.0)
     except Exception:
         yh = y
+    _report(0.18, "tracking pitch")
     S = np.abs(librosa.stft(yh, n_fft=2048, hop_length=hop))
     freqs = librosa.fft_frequencies(sr=sr, n_fft=2048)
     times = librosa.times_like(S, sr=sr, hop_length=hop)
     frame_seconds = hop / sr
     try:
         f0, voiced, _ = librosa.pyin(yh, fmin=max(20.0, min_f), fmax=max_f,
-                                      sr=sr, hop_length=hop)
+                                      sr=sr, hop_length=pyin_hop)
+        scale = pyin_hop // hop
     except Exception:
-        f0, voiced = None, None
+        f0, voiced, scale = None, None, 1
+    _report(0.75, "finding notes")
     try:
         onsets = librosa.onset.onset_detect(y=yh, sr=sr, hop_length=hop, backtrack=True)
     except Exception:
@@ -87,9 +123,11 @@ def transcribe_file_librosa_v2(wav_path: str, out_mid: str, sr: int = 22050,
             spec_midi = float(librosa.hz_to_midi(f))
         pm: float | None = None
         if f0 is not None and voiced is not None:
-            seg = f0[a:b]
-            ok = seg[voiced[a:b] & ~np.isnan(seg)]
-            if ok.size >= 3:
+            pa = max(0, a // scale - 1)
+            pb = min(len(f0), b // scale + 1)
+            seg = f0[pa:pb]
+            ok = seg[voiced[pa:pb] & ~np.isnan(seg)]
+            if ok.size >= 2:
                 pm = float(librosa.hz_to_midi(float(np.median(ok))))
         if pm is None:
             return spec_midi
@@ -140,6 +178,7 @@ def transcribe_file_librosa_v2(wav_path: str, out_mid: str, sr: int = 22050,
                     add_note(second, t0, t1)
             s = e
     notes.sort(key=lambda n: (n["start_seconds"], n["pitch"]))
+    _report(0.95, "writing score")
     write_midi(out_mid, notes)
     return len(notes)
 
