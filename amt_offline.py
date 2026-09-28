@@ -30,8 +30,13 @@ def transcribe_file_auto(wav_path: str, out_mid: str, sr: int = 22050,
 
 def transcribe_file_librosa_v2(wav_path: str, out_mid: str, sr: int = 22050,
                                min_f: float = 30.0, max_f: float = 4200.0,
-                               lo_midi: int = 21, hi_midi: int = 108) -> int:
-    """Onset-segmented monophonic transcription: one note per onset segment."""
+                               lo_midi: int = 21, hi_midi: int = 108,
+                               slice_seconds: float = 0.5) -> int:
+    """Onset-segmented monophonic transcription covering the full duration.
+
+    Long onset segments are subdivided into fixed slices so sustained/
+    legato passages (few onsets) still emit notes across the whole file.
+    """
     import librosa
     from amt_score import write_midi
     y, _ = librosa.load(wav_path, sr=sr, mono=True)
@@ -40,31 +45,41 @@ def transcribe_file_librosa_v2(wav_path: str, out_mid: str, sr: int = 22050,
         return 0
     hop = 512
     S = np.abs(librosa.stft(y, n_fft=2048, hop_length=hop))
-    pitches, mags = librosa.piptrack(S=np.abs(librosa.stft(y, n_fft=2048, hop_length=hop)), sr=sr)
+    pitches, mags = librosa.piptrack(S=S, sr=sr)
     times = librosa.times_like(S, sr=sr, hop_length=hop)
+    frame_seconds = hop / sr
     try:
         onsets = librosa.onset.onset_detect(y=y, sr=sr, hop_length=hop, backtrack=True)
     except Exception:
         onsets = []
     bounds = sorted(set([0] + [int(o) for o in onsets] + [S.shape[1]]))
+    max_slice_frames = max(1, int(slice_seconds / frame_seconds))
     notes = []
     for a, b in zip(bounds, bounds[1:]):
         if b <= a:
             continue
-        seg = mags[:, a:b]
-        if seg.size == 0:
-            continue
-        j = a + int(np.argmax(seg.mean(axis=1)))
-        f = float(pitches[min(j, pitches.shape[0] - 1), min(a, pitches.shape[1] - 1)])
-        peak = float(seg.max())
-        if min_f < f < max_f and peak > 0.01:
-            midi = int(round(69 + 12 * np.log2(f / 440.0)))
-            t0 = float(times[a])
-            t1 = float(times[min(b, len(times) - 1)])
-            if t1 - t0 < 0.12:
-                t1 = t0 + 0.3
-            notes.append({"pitch": max(lo_midi, min(hi_midi, midi)), "velocity": 80,
-                          "start_seconds": t0, "end_seconds": min(t1, t0 + 2.0)})
+        # Subdivide long legato stretches so output spans the whole file.
+        s = a
+        while s < b:
+            e = min(b, s + max_slice_frames)
+            seg = mags[:, s:e]
+            if seg.size == 0:
+                s = e
+                continue
+            mean_mag = seg.mean(axis=1)
+            j = int(np.argmax(mean_mag))
+            f = float(pitches[min(j, pitches.shape[0] - 1), min(s, pitches.shape[1] - 1)])
+            peak = float(seg.max())
+            floor = float(np.median(seg) * 1.5)
+            if min_f < f < max_f and peak > max(0.003, floor):
+                midi = int(round(69 + 12 * np.log2(f / 440.0)))
+                t0 = float(times[s])
+                t1 = float(times[min(e, len(times) - 1)])
+                if t1 - t0 < 0.12:
+                    t1 = t0 + 0.3
+                notes.append({"pitch": max(lo_midi, min(hi_midi, midi)), "velocity": 80,
+                              "start_seconds": t0, "end_seconds": t1})
+            s = e
     write_midi(out_mid, notes)
     return len(notes)
 

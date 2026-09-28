@@ -186,15 +186,14 @@ def write_generated_csv(path: Path, notes: list[dict[str, float | int]]) -> None
 
 
 def write_varlen(value: int) -> bytes:
-    buffer = value & 0x7F
+    if value < 0:
+        raise ValueError("VLQ value must be non-negative")
+    out = bytearray([value & 0x7F])
     value >>= 7
-    output = bytearray()
     while value:
-        output.insert(0, (buffer | 0x80) & 0xFF)
-        buffer = value & 0x7F
+        out.insert(0, (value & 0x7F) | 0x80)
         value >>= 7
-    output.append(buffer)
-    return bytes(output)
+    return bytes(out)
 
 
 def write_midi(path: Path, notes: list[dict[str, float | int]]) -> None:

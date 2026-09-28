@@ -5,14 +5,13 @@ from pathlib import Path
 
 
 def _varlen(v: int) -> bytes:
-    buf = v & 0x7F
+    if v < 0:
+        raise ValueError("VLQ value must be non-negative")
+    out = bytearray([v & 0x7F])
     v >>= 7
-    out = bytearray()
     while v:
-        out.insert(0, (buf | 0x80) & 0xFF)
-        buf = v & 0x7F
+        out.insert(0, (v & 0x7F) | 0x80)
         v >>= 7
-    out.append(buf)
     return bytes(out)
 
 
@@ -41,11 +40,19 @@ def write_midi(path: str | Path, notes: list[dict], bpm: float = 120.0) -> None:
         f.write(track)
 
 
-def midi_to_musicxml(mid_path: str | Path, out_xml: str | Path) -> bool:
+def midi_to_musicxml(mid_path: str | Path, out_xml: str | Path,
+                     title: str = "Transcription") -> bool:
     try:
         from music21 import converter
     except ImportError:
         return False
     score = converter.parse(str(mid_path))
+    try:
+        score.metadata = score.metadata or __import__("music21").metadata.Metadata()
+        score.metadata.title = title
+        for part in score.parts:
+            part.partName = "Piano"
+    except Exception:
+        pass
     score.write("musicxml", str(out_xml))
     return True
